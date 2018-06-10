@@ -183,7 +183,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="FF_Neural.h" />
+    <ClInclude Include="FFNN.h" />
+    <ClInclude Include="MnistFileSelDlg.h" />
     <ClInclude Include="NeuralNetwork_NumOCR.h" />
     <ClInclude Include="NeuralNetwork_NumOCRDlg.h" />
     <ClInclude Include="resource.h" />
@@ -191,7 +192,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FF_Neural.cpp" />
+    <ClCompile Include="FFNN.cpp" />
+    <ClCompile Include="MnistFileSelDlg.cpp" />
     <ClCompile Include="NeuralNetwork_NumOCR.cpp" />
     <ClCompile Include="NeuralNetwork_NumOCRDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

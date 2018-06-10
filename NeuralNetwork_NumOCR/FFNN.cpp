@@ -1,4 +1,4 @@
 #include "stdafx.h"
-#include "FF_Neural.h"
+#include "FFNN.h"
 #include <math.h>
 
