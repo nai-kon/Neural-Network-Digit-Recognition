@@ -10,13 +10,24 @@ typedef std::vector<double> doubleVec;
 
 void printVec(const doubleVec &vec); // デバッグ用
 
-									 // 順伝播型ニューラルネットワーク
-									 // 入力層、中間層(1層)、出力層の3層構造
+
 class FF_Neural
 {
 public:
 	FF_Neural();
 	~FF_Neural();
+
+	// 学習
+	int	Training(const CStatic &m_stResDisp);
+
+	// 推論
+	void Inference(const doubleVec& vecIn, const CStatic &m_stResDisp)
+
+	// 訓練画像パスのセット
+	void SetTraingImgPath(LPCTSTR lpszImgPath) : m_pszTrainImgPath(lpszImgPath);
+	void SetTestImgPath(LPCTSTR lpszImgPath) : m_pszTestImgPath(lpszImgPath);
+
+private:
 
 	// 順方向伝搬
 	void ForwardProp(const doubleVec &vecZ0, doubleVec &vecZ1, doubleVec &vecZ2);
@@ -24,20 +35,9 @@ public:
 	// 逆方向伝搬
 	double BackProp(const doubleVec &vecZ0, const doubleVec &ExpZ2);
 
-	// 重みのランダム初期化
-	void InitWeight();
-
-	// 重みデータの読み込み
-	int	LoadWeight();
-
-	// 重みデータ読み込み済みか (次元数が読めてたら済みとする)
-	BOOL LoadComplete() { return m_vecW1.size() > 0; }
-
-	// 重みデータの書き込み
-	int	SaveWeight();
-
-private:
-
+	void InitWeight(); // 重みのランダム初期化
+	int	LoadWeight();  // 重みの読み込み
+	int	SaveWeight();  // 重みの保存
 	void VecSoftMax(doubleVec &vec);	// ソフトマックス関数
 	double Sigmoid(double dVal);		// シグモイド関数
 	double SigmoidDash(double dVal);	// シグモイド関数の微分値
@@ -48,5 +48,7 @@ private:
 	int	m_il0Size;			// 入力層の次元数
 	int	m_il1Size;			// 中間層の次元数
 	int	m_il2Size;			// 出力層の次元数
+	LPCTSTR m_pszTrainImgPath; // トレーニングMNIST画像パス
+	LPCTSTR m_pszTestImgPath;  // テスト用MNIST画像パス
 
 };

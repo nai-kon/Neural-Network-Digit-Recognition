@@ -60,7 +60,7 @@ void FF_Neural::VecSoftMax(doubleVec &vec)
 
 
 // 重みの初期値を設定
-void FF_Neural::InitWeight()
+void FF_Neural::InitWeight(InitWeight()
 {
 	// 入力層-中間層の重みの初期値
 	int iW1Size = m_il0Size * m_il1Size;
@@ -257,40 +257,119 @@ void FF_Neural::ForwardProp(const doubleVec &vecZ0, doubleVec &vecZ1, doubleVec 
 	VecSoftMax(vecZ2);
 }
 
-/**
-// 学習
-int	FF_Neural::Training(const doubleVec &vecIn, const doubleVec &ExpZ2)
+
+// 学習処理
+int	FF_Neural::Training(const CStatic &m_stResDisp)
 {
-FILE *fpImg = NULL;
-FILE *fpLabel = NULL;
+	CString strDispMsg;
+	m_il0Size = MNIST_IMG_SIZE;
+	FILE *fpImg = NULL;
+	FILE *fpLabel = NULL;
 
-m_il0Size = MNIST_IMG_SIZE;
+	// 教師データのオープン
+	if(GetFP_MnistTraningData(&fpImg, &fpLabel, false)!= 0){
+		AfxMessageBox(_T("教師データオープン失敗"));
+		return -1;
+	}
 
-InitWeight();
+	// 重みをランダムで初期化
+	InitWeight();
 
-if(GetFP_MnistTraningData(&fpImg, &fpLabel, false)!= 0){
-printf("訓練データオープン失敗\n");
-return -1;
+	// 訓練
+	for(int iCnt = 0; iCnt < MNIST_TRANING_IMG_CNT; iCnt++){
+
+		MNIST_DATA sTraningData;
+		GetMnistImgAndLabel(fpImg, fpLabel, sTraningData, iCnt);
+
+		doubleVec vecImg, vecLabel;
+		ConvMNISTtoVec(sTraningData, vecImg, vecLabel);
+		CenteringInputImg(vecImg);
+
+		double dErr = ffnn.BackProp(vecImg, vecLabel);
+		
+		if(iCnt % 100 == 0) {
+			// 途中経過を表示
+			strDispMsg.Format(_T(”Trainig Process...\n %d/%d : miss:%f”, 
+					iCnt, MNIST_TRANING_IMG_CNT, dErr));
+			m_stResDisp.SetWindowText(strDispMsg);
+		}
+	}
+
+	// 教師データのClose
+	CloseMnistData(&fpImg, &fpLabel);
+
+	// テストデータのオープン
+	if(OpenMnistData(&fpImg, &fpLabel, true)!= 0){
+		AfxMessageBox(_T("テストデータオープン失敗"));
+		return -1;
+	}
+
+	// テスト
+	int iOKNum = 0;
+	for(int iCnt = 0; iCnt < MNIST_TEST_IMG_CNT; iCnt++){
+
+		MNIST_DATA sTraningData;
+		GetMnistImgAndLabel(fpImg, fpLabel, sTraningData, iCnt);  
+
+		doubleVec vecImg, vecLabel;
+		ConvMNISTtoVec(sTraningData, vecImg, vecLabel);
+
+		doubleVec vecZ1, vecOut;
+		ffnn.ForwardProp(vecImg, vecZ1, vecOut);
+
+		if(CheckInference(sTraningData, vecOut)){
+			iOKNum++;
+		}
+
+		if(iCnt % 100 == 0) {
+			// 途中経過を表示
+			strDispMsg.Format(_T(”Test Process...\n %d/%d : Accuracy:%4.1f%”, 
+					iCnt, MNIST_TEST_IMG_CNT, (double)iOKNum/iCnt));
+			m_stResDisp.SetWindowText(strDispMsg);
+		}		
+	}
+
+	// テスト結果表示
+	strDispMsg.Format(_T(”Test done...\n Accuracy:%4.1f%”, (double)iOKNum/MNIST_TEST_IMG_CNT);
+	m_stResDisp.SetWindowText(strDispMsg);
+
+	// 重みの保存
+	SaveWeight();
+
+	return 0;
 }
 
-// 教師データの読み込み
-double dErr = 0;
-for(int iCnt = 0; iCnt < MNIST_TRANING_IMG_CNT; iCnt++){
 
-MNIST_DATA sTraningData;
-GetMnistImgAndLabel(fpImg, fpLabel, sTraningData, iCnt);
+// 推論処理
+void CNeuralNetworkNumOCRDlg::Inference(const doubleVec& vecIn, const CStatic &m_stResDisp)
+{
+	// 重みの読み込み
+	if(m_vecW1.size() == 0 && LoadWeight() != 0){
+		AfxMessageBox(_T("重みの読み込み失敗"));
+		return;
+	}
 
-doubleVec vecImg, vecLabel;
-ConvMNISTtoVec(sTraningData, vecImg, vecLabel);
-CenteringInputImg(vecImg);
+	// 順方向伝搬による推論
+	doubleVec vecZ1, vecOut;
+	ForwardProp(vecIn, vecZ1, vecOut);
 
-dErr = ffnn.BackProp(vecImg, vecLabel);
-if(iCnt % 100 == 0) printf("iCnt = %d dMiss:%f\n", iCnt, dErr);
+	// 認識結果の表示
+	CString strResult, strPercentage;
+	int iAnsNum = -1;
+	double dMaxLabel = -1;
+	for (int iCnt = 0; iCnt < 10; iCnt++) {
+		if (vecOut[iCnt] > dMaxLabel) {
+			dMaxLabel = vecOut[iCnt];
+			iAnsNum = iCnt;
+		}
+		CString strBuf;
+		strBuf.Format(_T("[%01d]...%5.3f%%\n"), iCnt, vecOut[iCnt] * 100);
+		strPercentage += strBuf;
+	}
+
+	// 正解率の表示
+	strResult.Format(_T("推論した数値...%d\n\n%s"), iAnsNum, strPercentage);
+	m_stResDisp.SetWindowText(strResult);
+
+	return:
 }
-
-
-SaveWeight();
-
-
-}
-**/
