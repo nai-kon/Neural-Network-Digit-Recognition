@@ -80,5 +80,8 @@
     <Image Include="res\Toolbar256.bmp">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="res\App.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
 </Project>

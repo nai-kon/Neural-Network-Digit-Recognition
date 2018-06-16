@@ -306,7 +306,7 @@ int	FF_Neural::Training(CStatic &m_stResDisp)
 	strImgPath.Format(_T("%s\\" MNIST_TRAINING_IMG_PATH), m_pszTrainFolderPath);
 	strLabelPath.Format(_T("%s\\" MNIST_TRAINING_LABEL_PATH), m_pszTrainFolderPath);
 	if(GetMnistDataFP(&fpImg, &fpLabel, strImgPath, strLabelPath)!= 0){
-		AfxMessageBox(_T("教師データオープン失敗"));
+		AfxMessageBox(_T("Failed to Load Training Data"));
 		return -1;
 	}
 
@@ -339,7 +339,7 @@ int	FF_Neural::Training(CStatic &m_stResDisp)
 	strImgPath.Format(_T("%s\\" MNIST_TEST_IMG_PATH), m_pszTestFolderPath);
 	strLabelPath.Format(_T("%s\\" MNIST_TEST_LABEL_PATH), m_pszTestFolderPath);
 	if(GetMnistDataFP(&fpImg, &fpLabel, strImgPath, strLabelPath)!= 0){
-		AfxMessageBox(_T("テストデータオープン失敗"));
+		AfxMessageBox(_T("Failed to Load Test Data"));
 		return -1;
 	}
 
@@ -386,7 +386,6 @@ void FF_Neural::Inference(const doubleVec& vecIn, CStatic &m_stResDisp)
 {
 	// 重みの読み込み
 	if(m_vecW1.size() == 0 && LoadWeight() != 0){
-		AfxMessageBox(_T("重みの読み込み失敗"));
 		return;
 	}
 

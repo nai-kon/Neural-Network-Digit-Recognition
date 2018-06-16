@@ -11,13 +11,11 @@ int GetMnistDataFP(FILE **fppImg, FILE **fppLabel, LPCTSTR lpszImgPath, LPCTSTR 
 	// MNIST画像データ
 	_tfopen_s(fppImg ,lpszImgPath, _T("rb"));
 	if(*fppImg == NULL) return -1;
-    printf("imgOK\n");
 
 	// MNISTラベルデータ
 	_tfopen_s(fppLabel, lpszLabelPath, _T("rb"));
 	if(!*fppLabel) return -1;
 
-    printf("labelOK\n");
 	return 0;
 }
 
