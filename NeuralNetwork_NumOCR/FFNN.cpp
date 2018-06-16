@@ -371,7 +371,7 @@ int	FF_Neural::Training(CStatic &m_stResDisp)
 	ReleaseMnistDataFP(&fpImg, &fpLabel);
 
 	// テスト結果表示
-	strDispMsg.Format(_T("Test done...\n Accuracy:%5.2f%%"), (double)uiOKNum * 100 /MNIST_TEST_IMG_CNT);
+	strDispMsg.Format(_T("Training done...\n Accuracy:%5.2f%%"), (double)uiOKNum * 100 /MNIST_TEST_IMG_CNT);
 	m_stResDisp.SetWindowText(strDispMsg);
 
 	// 重みの保存
@@ -409,7 +409,7 @@ void FF_Neural::Inference(const doubleVec& vecIn, CStatic &m_stResDisp)
 	}
 
 	// 正解率の表示
-	strResult.Format(_T("推論した数値...%d\n\n%s"), iAnsNum, strPercentage);
+	strResult.Format(_T("Estimate...%d\n\n%s"), iAnsNum, strPercentage);
 	m_stResDisp.SetWindowText(strResult);
 
 	return;
