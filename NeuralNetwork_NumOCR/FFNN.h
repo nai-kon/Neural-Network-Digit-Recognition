@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+#include "mnist.h"
 
 // 重みデータのファイルパス
 #define FFNN_WEIGHT_FILE_PATH "WeightFile"
@@ -18,14 +19,14 @@ public:
 	~FF_Neural();
 
 	// 学習
-	int	Training(const CStatic &m_stResDisp);
+	int	Training(CStatic &m_stResDisp);
 
 	// 推論
-	void Inference(const doubleVec& vecIn, const CStatic &m_stResDisp)
+	void Inference(const doubleVec& vecIn, CStatic &m_stResDisp);
 
 	// 訓練画像パスのセット
-	void SetTraingImgPath(LPCTSTR lpszImgPath) : m_pszTrainImgPath(lpszImgPath);
-	void SetTestImgPath(LPCTSTR lpszImgPath) : m_pszTestImgPath(lpszImgPath);
+	void SetTraingFolderPath(LPCTSTR lpszImgPath) { m_pszTrainFolderPath = lpszImgPath; }
+	void SetTestFolderPath(LPCTSTR lpszImgPath) { m_pszTestFolderPath = lpszImgPath; }
 
 private:
 
@@ -41,6 +42,8 @@ private:
 	void VecSoftMax(doubleVec &vec);	// ソフトマックス関数
 	double Sigmoid(double dVal);		// シグモイド関数
 	double SigmoidDash(double dVal);	// シグモイド関数の微分値
+	BOOL CheckInference(const MNIST_DATA &Mn, doubleVec &vecOut);
+	void ConvMNISTtoVec(const MNIST_DATA &Mn, doubleVec &vecImg, doubleVec &vecLabel);
 
 	doubleVec m_vecW1;		// 入力層-中間層の重み
 	doubleVec m_vecW2;		// 中間層-出力層の重み
@@ -48,7 +51,7 @@ private:
 	int	m_il0Size;			// 入力層の次元数
 	int	m_il1Size;			// 中間層の次元数
 	int	m_il2Size;			// 出力層の次元数
-	LPCTSTR m_pszTrainImgPath; // トレーニングMNIST画像パス
-	LPCTSTR m_pszTestImgPath;  // テスト用MNIST画像パス
+	LPCTSTR m_pszTrainFolderPath; // トレーニングMNISTフォルダパス
+	LPCTSTR m_pszTestFolderPath;  // テスト用MNISTフォルダパス
 
 };

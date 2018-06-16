@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="FFNN.h" />
+    <ClInclude Include="mnist.h" />
     <ClInclude Include="MnistFileSelDlg.h" />
     <ClInclude Include="NeuralNetwork_NumOCR.h" />
     <ClInclude Include="NeuralNetwork_NumOCRDlg.h" />
@@ -193,6 +194,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FFNN.cpp" />
+    <ClCompile Include="mnist.cpp" />
     <ClCompile Include="MnistFileSelDlg.cpp" />
     <ClCompile Include="NeuralNetwork_NumOCR.cpp" />
     <ClCompile Include="NeuralNetwork_NumOCRDlg.cpp" />

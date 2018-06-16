@@ -36,6 +36,9 @@
     <ClInclude Include="MnistFileSelDlg.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="mnist.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NeuralNetwork_NumOCR.cpp">
@@ -51,6 +54,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="MnistFileSelDlg.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="mnist.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
