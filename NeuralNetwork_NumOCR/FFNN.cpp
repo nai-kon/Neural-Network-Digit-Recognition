@@ -323,8 +323,18 @@ int	FF_Neural::Training(CStatic &m_stResDisp)
 		ConvMNISTtoVec(sTraningData, vecImg, vecLabel);
 
 		double dErr = BackProp(vecImg, vecLabel);
-		
+
+
+
 		if(iCnt % 500 == 0) {
+			// メッセージ処理を行う
+			MSG msg;
+			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+				if (msg.message == WM_QUIT || msg.message == WM_DESTROY || msg.message == WM_CLOSE) continue;
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
 			// 途中経過を表示
 			strDispMsg.Format(_T("Training processing...\n %d/%d : miss:%f"), 
 					iCnt, MNIST_TRANING_IMG_CNT, dErr);
@@ -361,6 +371,13 @@ int	FF_Neural::Training(CStatic &m_stResDisp)
 		}
 
 		if(iCnt % 500 == 0) {
+			// メッセージ処理を行う
+			MSG msg;
+			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
 			// 途中経過を表示
 			strDispMsg.Format(_T("Test Processing...\n %d/%d"), iCnt, MNIST_TEST_IMG_CNT);
 			m_stResDisp.SetWindowText(strDispMsg);
