@@ -210,6 +210,7 @@
     <ResourceCompile Include="NeuralNetworkNumOCR.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="res\NeuralNetworkNumOCR.rc2" />
   </ItemGroup>
   <ItemGroup>

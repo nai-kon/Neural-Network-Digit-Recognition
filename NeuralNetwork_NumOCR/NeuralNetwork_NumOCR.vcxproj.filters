@@ -69,6 +69,7 @@
     <None Include="res\NeuralNetworkNumOCR.rc2">
       <Filter>リソース ファイル</Filter>
     </None>
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\NeuralNetwork_NumOCR.ico">
