@@ -47,7 +47,8 @@ private:
 
 	doubleVec m_vecW1;		// 入力層-中間層の重み
 	doubleVec m_vecW2;		// 中間層-出力層の重み
-	double m_dB1;			// バイアス
+	doubleVec m_vecB1;		// 入力層-中間層のバイアス
+	doubleVec m_vecB2;		// 中間層-出力層のバイアス
 	int	m_il0Size;			// 入力層の次元数
 	int	m_il1Size;			// 中間層の次元数
 	int	m_il2Size;			// 出力層の次元数

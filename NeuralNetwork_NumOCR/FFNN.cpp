@@ -2,10 +2,10 @@
 #include "stdafx.h"
 #include "FFNN.h"
 #include <math.h>
+#include <random>
 
 FF_Neural::FF_Neural()
 {
-	m_dB1 = 0.5;				// バイアス
 	m_il0Size = MNIST_IMG_SIZE;	// 入力層は784次元(28x28)
 	m_il1Size = 100;			// 中間層は100次元
 	m_il2Size = 10;				// 出力層は10次元固定
@@ -80,12 +80,27 @@ void FF_Neural::ConvMNISTtoVec(const MNIST_DATA &Mn, doubleVec &vecImg, doubleVe
 // 重みの初期値を設定
 void FF_Neural::InitWeight()
 {
+
+	std::random_device seed_gen;
+	std::default_random_engine engine(seed_gen());
+
+	// 平均0.0、標準偏差0.01の正規分布
+	std::normal_distribution<> randn(0.0, 0.01);
+
+
 	// 入力層-中間層の重みの初期値
 	int iW1Size = m_il0Size * m_il1Size;
 	m_vecW1.clear();
 	m_vecW1.reserve(iW1Size);
 	for (int iCnt = 0; iCnt < iW1Size; iCnt++) {
-		m_vecW1.push_back(((2.0 * rand()) / RAND_MAX) - 1.0);	 // -1から+1の範囲
+		m_vecW1.push_back(randn(engine));
+	}
+
+	// 入力層-中間層のバイアスの初期値
+	m_vecB1.clear();
+	m_vecB1.reserve(m_il1Size);
+	for (int iCnt = 0; iCnt < m_il1Size; iCnt++) {
+		m_vecB1.push_back(0);
 	}
 
 	// 中間層-出力層の重みの初期値
@@ -93,11 +108,18 @@ void FF_Neural::InitWeight()
 	m_vecW2.clear();
 	m_vecW2.reserve(iW2Size);
 	for (int iCnt = 0; iCnt < iW2Size; iCnt++) {
-		m_vecW2.push_back(((2.0 * rand()) / RAND_MAX) - 1.0);	 // -1から+1の範囲
+		m_vecW2.push_back(randn(engine));
+	}
+
+	// 中間層-出力層のバイアスの初期値
+	m_vecB2.clear();
+	m_vecB2.reserve(m_il2Size);
+	for (int iCnt = 0; iCnt < m_il2Size; iCnt++) {
+		m_vecB2.push_back(0);
 	}
 }
 
-// 重みの読み込み
+// 重みの読込
 int	FF_Neural::LoadWeight()
 {
 	FILE *fp = NULL;
@@ -107,12 +129,8 @@ int	FF_Neural::LoadWeight()
 		return -1;
 	}
 
-	// バイアスの読み込み
-	char buf[256];
-	fgets(buf, sizeof(buf), fp);
-	fscanf_s(fp, "%lf\n", &m_dB1);
-
 	// 入力層の次元数
+	char buf[256];
 	fgets(buf, sizeof(buf), fp);
 	fscanf_s(fp, "%d\n", &m_il0Size);
 
@@ -134,6 +152,14 @@ int	FF_Neural::LoadWeight()
 		m_vecW1.push_back(dVal);
 	}
 
+	// 入力層-中間層のバイアス
+	fgets(buf, sizeof(buf), fp);
+	m_vecB1.reserve(m_il1Size);
+	for (int iCnt = 0; iCnt < m_il1Size; iCnt++) {
+		fscanf_s(fp, "%lf\n", &dVal);
+		m_vecB1.push_back(dVal);
+	}
+
 	// 中間層-出力層の重み
 	fgets(buf, sizeof(buf), fp);
 	int iW2Size = m_il1Size * m_il2Size;
@@ -143,12 +169,20 @@ int	FF_Neural::LoadWeight()
 		m_vecW2.push_back(dVal);
 	}
 
+	// 中間層-出力層のバイアス
+	fgets(buf, sizeof(buf), fp);
+	m_vecB2.reserve(m_il2Size);
+	for (int iCnt = 0; iCnt < m_il2Size; iCnt++) {
+		fscanf_s(fp, "%lf\n", &dVal);
+		m_vecB2.push_back(dVal);
+	}
+
 	fclose(fp);
 
 	return 0;
 }
 
-// 重みの読み込み
+// 重みの保存
 int	FF_Neural::SaveWeight()
 {
 	FILE *fp = NULL;
@@ -157,9 +191,6 @@ int	FF_Neural::SaveWeight()
 		AfxMessageBox(_T("Save:WeightFile Open Failed"));
 		return -1;
 	}
-
-	fputs("#Bias\n", fp);
-	fprintf(fp, "%f\n", m_dB1);
 
 	fputs("#Neuron Num of l0Layer\n", fp);
 	fprintf(fp, "%d\n", m_il0Size);
@@ -176,10 +207,20 @@ int	FF_Neural::SaveWeight()
 		fprintf(fp, "%f\n", m_vecW1.at(iCnt));
 	}
 
+	fputs("#Bias of l0-l1\n", fp);
+	for (int iCnt = 0; iCnt < m_il1Size; iCnt++) {
+		fprintf(fp, "%f\n", m_vecB1.at(iCnt));
+	}
+
 	fputs("#Weights of l1-l2\n", fp);
 	iSize = m_vecW2.size();
 	for (int iCnt = 0; iCnt < iSize; iCnt++) {
 		fprintf(fp, "%f\n", m_vecW2.at(iCnt));
+	}
+
+	fputs("#Bias of l1-l2\n", fp);
+	for (int iCnt = 0; iCnt < m_il2Size; iCnt++) {
+		fprintf(fp, "%f\n", m_vecB2.at(iCnt));
 	}
 
 	fclose(fp);
@@ -224,6 +265,9 @@ double FF_Neural::BackProp(const doubleVec &vecZ0, const doubleVec &ExpZ2)
 	double dEps = 0.015; //学習係数
 
 	for (int il2 = 0; il2 < m_il2Size; il2++) {
+		// B2の更新
+		m_vecB2[il2] -= dEps * vecDel2[il2];
+
 		// W2の重み更新
 		int iW2Offset = il2 * m_il1Size;
 		for (int iCnt = 0; iCnt < m_il1Size; iCnt++) {
@@ -232,6 +276,9 @@ double FF_Neural::BackProp(const doubleVec &vecZ0, const doubleVec &ExpZ2)
 	}
 
 	for (int il1 = 0; il1 < m_il1Size; il1++) {
+		// B1の更新
+		m_vecB1[il1] -= dEps * vecDel1[il1];
+
 		// W1の重み更新
 		int iW1Offset = il1 * m_il0Size;
 		for (int iCnt = 0; iCnt < m_il0Size; iCnt++) {
@@ -250,7 +297,7 @@ void FF_Neural::ForwardProp(const doubleVec &vecZ0, doubleVec &vecZ1, doubleVec 
 	vecZ1.reserve(m_il1Size);
 	for (int il1 = 0; il1 < m_il1Size; il1++) {
 
-		double dSum = 0;
+		double dSum = m_vecB1[il1];
 		int iW1Offset = il1 * m_il0Size;
 		for (int iCnt = 0; iCnt < m_il0Size; iCnt++) {
 			dSum += vecZ0[iCnt] * m_vecW1[iW1Offset + iCnt];
@@ -264,7 +311,7 @@ void FF_Neural::ForwardProp(const doubleVec &vecZ0, doubleVec &vecZ1, doubleVec 
 	vecZ2.reserve(m_il2Size);
 	for (int il2 = 0; il2 < m_il2Size; il2++) {
 
-		double dSum = m_dB1;	// バイアス値を加える
+		double dSum = m_vecB2[il2];
 		int iW2Offset = il2 * m_il1Size;
 		for (int iCnt = 0; iCnt < m_il1Size; iCnt++) {
 			dSum += vecZ1[iCnt] * m_vecW2[iW2Offset + iCnt];
@@ -336,7 +383,7 @@ int	FF_Neural::Training(CStatic &m_stResDisp)
 			}
 
 			// 途中経過を表示
-			strDispMsg.Format(_T("Training processing...\n %d/%d : miss:%f"), 
+			strDispMsg.Format(_T("Training processing...\n %d/%d : Err:%f"), 
 					iCnt, MNIST_TRANING_IMG_CNT, dErr);
 			m_stResDisp.SetWindowText(strDispMsg);
 		}
