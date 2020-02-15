@@ -1,7 +1,7 @@
 ## Digit Recognition with Neural Network
 Handwritten Digit Recognition consists of 3-layer Feedforward Neural Network.   
 
-![Digit Recognition](./DigitRecognition.png)
+![UI](./UI.png)
 
 
 ## Specific
@@ -9,14 +9,14 @@ Handwritten Digit Recognition consists of 3-layer Feedforward Neural Network.
 #### Network
   
 - 1st layer (input) 　　    
-    784 Neurons　(28x28) 　　  
+    784 Neurons (28x28) 　　  
   
 - 2nd layer (hidden) 　　    
     100 Neurons 　　    
     Sigmoid Activation Function
 
 - 3rd layer (output) 　　    
-    10 Neurons　(0-9) 　　    
+    10 Neurons (0-9) 　　    
     Softmax function
 
 - Cross Entropy Backpropagation
@@ -25,14 +25,23 @@ Handwritten Digit Recognition consists of 3-layer Feedforward Neural Network.
 
 #### Application
 
-- Windows MFC based
-- Build in VS2017
+- MFC app
+- Build with Visual Studio 2017
 
-## Usage
+## Training
 
-- #### Training
-  Select training button and choose folder of MNIST Training/Test Images.  
+1. Download MNIST dataset from http://yann.lecun.com/exdb/mnist/
+2. Unzip dataset and locate to below directory
+```
+     train_data/ 
+            ├ train-images-idx3-ubyte
+            └ train-labels-idx1-ubyte
 
-- #### Recognition
-  Select recognition button after writing one digit.
+     test_data/ 
+            ├ t10k-images-idx3-ubyte
+            └ t10k-labels-idx1-ubyte
+```
+
+3. Click "Training" and select train/test dir
+
   
